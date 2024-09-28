@@ -1,0 +1,38 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Allow authenticated users to read their own friends
+    match /friends/{friendId} {
+      allow read, write: if request.auth != null && request.auth.uid == friendId;
+    }
+
+    // Match conversations collection
+    match /conversations/{conversationId}/messages/{messageId} {
+      
+      // Allow read if the user is authenticated and is part of the conversation
+      allow read: if isAuthenticated() && isPartOfConversation(conversationId);
+      
+      // Allow create if the user is authenticated, is part of the conversation, and can create a message
+      allow create: if isAuthenticated() && isPartOfConversation(conversationId) && canCreateMessage();
+    }
+
+    // Function to check if the user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Function to check if the user is part of the conversation
+    function isPartOfConversation(conversationId) {
+      let participants = conversationId.split('_');  // Split the conversationId into UIDs
+      return participants.hasAny([request.auth.uid]); // Check if the user's UID is part of the conversation
+    }
+
+    // Function to check if the user can create a message (ensure they're not banned)
+    function canCreateMessage() {
+      let isNotBanned = !exists(/databases/$(database)/documents/banned/$(request.auth.uid));
+      return isNotBanned;
+    }
+  }
+}
