@@ -8,14 +8,42 @@ function SignIn() {
   const signInWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
     provider.setCustomParameters({
-      prompt: 'select_account'  // Forces account selection screen
+      prompt: 'select_account', // Forces account selection screen
     });
 
     try {
-      await signInWithPopup(auth, provider);
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+
+      // Prepare user data
+      const userData = {
+        uid: user.uid,
+        email: user.email,
+      };
+
+      // Call the Cloud Function to store user data
+      const response = await fetch('https://us-central1-chatapp-a1d5f.cloudfunctions.net/storeUserData', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(userData),
+      });
+
+      // Check if response is not ok
+      if (!response.ok) {
+        const errorText = await response.text(); // Read the error response
+        throw new Error(`Failed to store user data: ${errorText}`);
+      }
+
+      console.log("User data stored successfully.");
+
     } catch (error) {
+      // Differentiate the error messages based on error type
       if (error.code === 'auth/popup-closed-by-user') {
         setErrorMessage('The sign-in popup was closed. Please try again.');
+      } else if (error.message.includes('Failed to store user data')) {
+        setErrorMessage('There was an issue storing your data. Please try again later.');
       } else {
         setErrorMessage('An error occurred during sign-in. Please try again.');
       }
@@ -29,7 +57,7 @@ function SignIn() {
         <h1 className="text-4xl font-extrabold text-white mb-6 text-center">
           Welcome to Real Chat
         </h1>
-        
+
         <p className="text-gray-300 text-center mb-8 max-w-xs mx-auto">
           Connect and communicate with your friends privately and securely.
         </p>

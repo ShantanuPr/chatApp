@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { collection, query, orderBy, limit, addDoc, serverTimestamp } from 'firebase/firestore'; 
 import { firestore, auth } from '../firebase'; 
 import { useCollectionData } from 'react-firebase-hooks/firestore';
@@ -11,48 +10,17 @@ function genID(a, b) {
 }
 
 function ChatRoom() {
-  const [receiverUid, setReceiverUid] = useState(null);  
+  const [receiverUid, setReceiverUid] = useState(null);  // For one-to-one chat
   const [formValue, setFormValue] = useState('');
   const [error, setError] = useState('');
   const [messagesRef, setMessagesRef] = useState(null);
+
   const [messages] = useCollectionData(messagesRef, { idField: 'id' });
 
- 
   const users = [
     { id: "Zwv4kSkaQ2gW6saeexEKnbqQug73", displayName: 'Anandan', photo: 'logo1.png' },
     { id: "UluQHwfE1ec813UTVrWZHf8MXFy1", displayName: 'Shantanu', photo: 'logo2.png' },
-    
   ];
-
-//  Register the current user 
-  const registerUser = async () => {
-    try {
-      const currentUser = auth.currentUser;
-      if (!currentUser) {
-        throw new Error("User not authenticated.");
-      }
-
-      //  data for registration
-      const registrationData = {
-        uuid: currentUser.uid,
-        email: currentUser.email,
-      };
-
-      // Send a PUT request to register the user
-      const response = await axios.put('http://localhost:3000/register/user', registrationData);
-
-      console.log("User registered:", response.data.message);
-    } catch (err) {
-      console.error("Error registering user:", err);
-    }
-  };
-
-  useEffect(() => {
-    const currentUser = auth.currentUser; 
-    if (currentUser) {
-      registerUser();
-    }
-  }, []); 
 
   useEffect(() => {
     if (receiverUid && auth.currentUser) {
@@ -65,7 +33,7 @@ function ChatRoom() {
     } else {
       setMessagesRef(null); // Reset when no user is selected
     }
-  }, [receiverUid]);
+  }, [receiverUid, auth.currentUser]);
 
   const sendMessage = async (e) => {
     e.preventDefault();
@@ -97,11 +65,13 @@ function ChatRoom() {
   return (
     <div className="flex h-screen">
       <div className="flex-none w-1/4 h-full p-5 bg-gray-800">
-        <Slider 
-          users={users.filter((u) => u.id !== auth.currentUser.uid)} 
-          selectUserToChat={(user) => setReceiverUid(user.id)} 
-          selectedUserId={receiverUid} 
-        />
+        {auth.currentUser && (
+          <Slider 
+            users={users.filter((u) => u.id !== auth.currentUser.uid)} 
+            selectUserToChat={(user) => setReceiverUid(user.id)} 
+            selectedUserId={receiverUid} 
+          />
+        )}
       </div>
 
       <div className="flex-grow flex flex-col pt-5 pr-5">

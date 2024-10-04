@@ -1,29 +1,35 @@
-// /**
-//  * Import function triggers from their respective submodules:
-//  *
-//  * const {onCall} = require("firebase-functions/v2/https");
-//  * const {onDocumentWritten} = require("firebase-functions/v2/firestore");
-//  *
-//  * See a full list of supported triggers at https://firebase.google.com/docs/functions
-//  */
-
-// const {onRequest} = require("firebase-functions/v2/https");
-// const logger = require("firebase-functions/logger");
-
-// // Create and deploy your first functions
-// // https://firebase.google.com/docs/functions/get-started
-
-// exports.helloWorld = onRequest((request, response) => {
-//   logger.info("Hello logs!", {structuredData: true});
-//   response.send("Hello from Firebase!");
-// });
-
-
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
+const cors = require("cors")({origin: true}); // No space inside the curly braces
+
 admin.initializeApp();
 
-// A simple HTTP Cloud Function
-exports.helloWorld = functions.https.onRequest((req, res) => {
-  res.send("Hello from Firebase!");
+exports.storeUserData = functions.https.onRequest((req, res) => {
+  cors(req, res, async () => {
+    if (req.method !== "POST") {
+      return res.status(405).send("Method Not Allowed");
+    }
+
+    const userData = req.body;
+
+    if (!userData || !userData.uid || !userData.email) {
+      return res.status(400).send("Invalid user data");
+    }
+
+    try {
+      await admin.firestore()
+          .collection("users")
+          .doc(userData.uid)
+          .set({
+            email: userData.email,
+            uid: userData.uid,
+            createdAt: admin.firestore.FieldValue.serverTimestamp(),
+          }, {merge: true}); // No space inside the curly braces
+
+      return res.status(200).send("User data stored successfully");
+    } catch (error) {
+      console.error("Error storing user data:", error);
+      return res.status(500).send("Internal Server Error");
+    }
+  });
 });
