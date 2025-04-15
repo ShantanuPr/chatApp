@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App]
@@ -43,3 +44,7 @@ You don't have to ever use `eject`. The curated feature set is suitable for smal
 
 ### `npm run build` fails to minify
 
+=======
+
+
+>>>>>>> d11bb03f9d90e5481a8103c07f7382740fae7b88
