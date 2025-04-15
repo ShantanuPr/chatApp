@@ -1,49 +1,36 @@
-import React, { useState } from 'react';
-import AddUserModal from './UserModal'; // Import your modal component
+import React, { useEffect, useState } from 'react';
+import { collection, onSnapshot, doc } from 'firebase/firestore';
+import { firestore, auth } from '../firebase';
 
-function Slider({ users, selectUserToChat, selectedUserId }) {
-  const [showModal, setShowModal] = useState(false); // State to control modal visibility
+function Slider({ selectUserToChat, selectedUserId }) {
+  const [acceptedUsers, setAcceptedUsers] = useState([]);
 
-  const handleAddUser = () => {
-    setShowModal(true); // Open modal when the "Add User" button is clicked
-  };
+  useEffect(() => {
+    const currentUser = auth.currentUser;
+    if (!currentUser) return;
+
+    const unsubscribe = onSnapshot(
+      collection(firestore, `users/${currentUser.uid}/invites`),
+      (snapshot) => {
+        const users = snapshot.docs
+          .filter(doc => doc.data().status === 'accepted')
+          .map(doc => ({ id: doc.id, ...doc.data() }));
+        setAcceptedUsers(users);
+      }
+    );
+
+    return () => unsubscribe();
+  }, []);
 
   return (
-    <div className="flex flex-col space-y-4 p-5 bg-gradient-to-br from-blue-500 to-gray-900 rounded-lg h-full overflow-y-auto">
-      {/* Add User Button */}
-      <div>
-        <button
-          className="bg-zinc-700 text-white px-4 py-2 rounded hover:bg-zinc-600 transition duration-150"
-          onClick={handleAddUser}
-        >
-          Add User
-        </button>
-
-        {/* Conditionally render Add User Modal */}
-        {showModal && <AddUserModal setShowModal={setShowModal} />}
-      </div>
-
-      {/* User List */}
-      {users && users.map((user) => (
+    <div className="overflow-y-auto">
+      {acceptedUsers.map((user) => (
         <div
           key={user.id}
-          className={`flex items-center cursor-pointer transition-transform transform 
-            ${selectedUserId === user.id ? 'shadow-lg rounded-lg shadow-blue-500' : 'hover:shadow-md'} 
-            p-2 transition-all duration-200`} 
-          onClick={() => selectUserToChat(user)} // Select user for chat on click
-          role="button"
-          tabIndex={0}
-          onKeyPress={(e) => e.key === 'Enter' && selectUserToChat(user)} // Handle keyboard interaction
-          aria-label={`Select ${user.displayName} to chat`} // Accessibility
+          className={`flex items-center p-2 cursor-pointer ${selectedUserId === user.id ? 'bg-gray-600' : 'hover:bg-gray-500'}`}
+          onClick={() => selectUserToChat(user)}
         >
-          {/* User Profile Image */}
-          <img 
-            src={`/Profile_images/${user.photo}`} 
-            alt={user.displayName} 
-            className="w-16 h-16 rounded-full border-2 border-gray-600 mr-4 transition-all duration-200" 
-          />
-          {/* Display User Name */}
-          <p className="text-white text-sm truncate">{user.displayName}</p> 
+          <span className="text-white">{user.fromName}</span>
         </div>
       ))}
     </div>

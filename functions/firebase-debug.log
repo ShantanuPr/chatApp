@@ -1,0 +1,64 @@
+[debug] [2024-10-16T05:10:48.736Z] ----------------------------------------------------------------------
+[debug] [2024-10-16T05:10:48.743Z] Command:       C:\Users\Shantanu\node_modules\node\bin\node.exe C:\Users\Shantanu\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js functions:shell
+[debug] [2024-10-16T05:10:48.744Z] CLI Version:   13.22.0
+[debug] [2024-10-16T05:10:48.744Z] Platform:      win32
+[debug] [2024-10-16T05:10:48.745Z] Node Version:  v20.15.0
+[debug] [2024-10-16T05:10:48.745Z] Time:          Wed Oct 16 2024 10:40:48 GMT+0530 (India Standard Time)
+[debug] [2024-10-16T05:10:48.746Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2024-10-16T05:10:48.996Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2024-10-16T05:10:48.997Z] > authorizing via signed-in user (shantanuchoudhary032@gmail.com)
+[debug] [2024-10-16T05:10:48.998Z] [iam] checking project chatapp-a1d5f for permissions ["firebase.projects.get"]
+[debug] [2024-10-16T05:10:49.001Z] Checked if tokens are valid: true, expires at: 1729058479614
+[debug] [2024-10-16T05:10:49.001Z] Checked if tokens are valid: true, expires at: 1729058479614
+[debug] [2024-10-16T05:10:49.004Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/chatapp-a1d5f:testIamPermissions [none]
+[debug] [2024-10-16T05:10:49.004Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/chatapp-a1d5f:testIamPermissions x-goog-quota-user=projects/chatapp-a1d5f
+[debug] [2024-10-16T05:10:49.005Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/chatapp-a1d5f:testIamPermissions {"permissions":["firebase.projects.get"]}
+[debug] [2024-10-16T05:10:51.013Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/chatapp-a1d5f:testIamPermissions 200
+[debug] [2024-10-16T05:10:51.014Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/chatapp-a1d5f:testIamPermissions {"permissions":["firebase.projects.get"]}
+[debug] [2024-10-16T05:10:51.029Z] [functions] Functions Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2024-10-16T05:10:51.035Z] defaultcredentials: writing to file C:\Users\Shantanu\AppData\Roaming\firebase\shantanuchoudhary032_gmail_com_application_default_credentials.json
+[debug] [2024-10-16T05:10:51.038Z] DEBUG: Setting GAC to C:\Users\Shantanu\AppData\Roaming\firebase\shantanuchoudhary032_gmail_com_application_default_credentials.json
+[debug] [2024-10-16T05:10:51.039Z] Checked if tokens are valid: true, expires at: 1729058479614
+[debug] [2024-10-16T05:10:51.040Z] Checked if tokens are valid: true, expires at: 1729058479614
+[debug] [2024-10-16T05:10:51.040Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/chatapp-a1d5f/adminSdkConfig [none]
+[debug] [2024-10-16T05:10:51.807Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/chatapp-a1d5f/adminSdkConfig 200
+[debug] [2024-10-16T05:10:51.807Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/chatapp-a1d5f/adminSdkConfig {"projectId":"chatapp-a1d5f","databaseURL":"https://chatapp-a1d5f-default-rtdb.firebaseio.com","storageBucket":"chatapp-a1d5f.appspot.com"}
+[debug] [2024-10-16T05:10:51.847Z] [functions] Watching "C:\Users\Shantanu\chatting_application\functions" for Cloud Functions...
+[debug] [2024-10-16T05:10:51.860Z] Validating nodejs source
+[warn] !  functions: package.json indicates an outdated version of firebase-functions. Please upgrade using npm install --save firebase-functions@latest in your functions directory. 
+[warn] !  functions: Please note that there will be breaking changes when you upgrade. 
+[debug] [2024-10-16T05:10:54.220Z] > [functions] package.json contents: {
+  "name": "functions",
+  "description": "Cloud Functions for Firebase",
+  "scripts": {
+    "lint": "eslint .",
+    "serve": "firebase emulators:start --only functions",
+    "shell": "firebase functions:shell",
+    "start": "npm run shell",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log"
+  },
+  "engines": {
+    "node": "18"
+  },
+  "main": "index.js",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "firebase-admin": "^12.1.0",
+    "firebase-functions": "^5.0.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.1",
+    "eslint-config-google": "^0.14.0",
+    "firebase-functions-test": "^3.1.0"
+  },
+  "private": true
+}
+[debug] [2024-10-16T05:10:54.220Z] Building nodejs source
+[debug] [2024-10-16T05:10:54.221Z] Failed to find version of module node: reached end of search path C:\Users\Shantanu\chatting_application\functions\node_modules
+[warn] !  functions: Your requested "node" version "18" doesn't match your global version "20". Using node@20 from host. 
+[debug] [2024-10-16T05:10:54.226Z] Could not find functions.yaml. Must use http discovery
+[debug] [2024-10-16T05:10:54.266Z] Found firebase-functions binary at 'C:\Users\Shantanu\chatting_application\functions\node_modules\.bin\firebase-functions'
+[info] Serving at port 8716
+

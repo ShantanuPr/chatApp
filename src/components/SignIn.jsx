@@ -15,10 +15,11 @@ function SignIn() {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
 
-      // Prepare user data
+      // Prepare user data including display name
       const userData = {
         uid: user.uid,
         email: user.email,
+        name: user.displayName,  // Add the user's name here
       };
 
       // Call the Cloud Function to store user data

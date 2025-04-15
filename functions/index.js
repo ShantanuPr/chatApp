@@ -12,7 +12,7 @@ exports.storeUserData = functions.https.onRequest((req, res) => {
 
     const userData = req.body;
 
-    if (!userData || !userData.uid || !userData.email) {
+    if (!userData || !userData.uid || !userData.email || !userData.name) {
       return res.status(400).send("Invalid user data");
     }
 
@@ -21,10 +21,11 @@ exports.storeUserData = functions.https.onRequest((req, res) => {
           .collection("users")
           .doc(userData.uid)
           .set({
+            name: userData.name,
             email: userData.email,
             uid: userData.uid,
             createdAt: admin.firestore.FieldValue.serverTimestamp(),
-          }, {merge: true}); // No space inside the curly braces
+          }, {merge: true});
 
       return res.status(200).send("User data stored successfully");
     } catch (error) {

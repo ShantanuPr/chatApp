@@ -1,71 +1,82 @@
-import React, { useRef } from 'react';
-import { collection, addDoc } from 'firebase/firestore';
-import { firestore } from '../firebase'; // Import Firestore configuration
+import React, { useState } from 'react';
+import { collection, getDocs, addDoc } from 'firebase/firestore'; 
+import { firestore } from '../firebase'; 
 
-const AddUserModal = ({ setShowModal }) => {
-  const emailRef = useRef();
-  const nameRef = useRef();
-  const errorRef = useRef();
+function UserModal({ isOpen, onClose, onUserAdded }) {
+  const [email, setEmail] = useState('');
+  const [name, setName] = useState('');
+  const [error, setError] = useState('');
+
+  // Function to check if the user with the given email and name exists in Firestore
+  const checkUserExists = async (email, name) => {
+    const usersCollection = collection(firestore, 'users');
+    const userDocs = await getDocs(usersCollection);
+    
+    // Check if both the email and name match any existing user
+    return userDocs.docs.some(doc => {
+      const userData = doc.data();
+      return userData.email === email && userData.name === name;
+    });
+  };
 
   const handleAddUser = async (e) => {
     e.preventDefault();
+    setError('');
 
-    const email = emailRef.current.value;
-    const name = nameRef.current.value;
-
-    if (email === '' || name === '') {
-      errorRef.current.textContent = 'Both fields are required';
+    // Check if the user with the given email and name exists
+    const userExists = await checkUserExists(email, name);
+    if (!userExists) {
+      setError('User cannot be found.');
       return;
     }
 
     try {
-      await addDoc(collection(firestore, 'friends'), {
-        email: email,
-        name: name,
+      // If user exists, proceed to add the user to Firestore
+      await addDoc(collection(firestore, 'users'), {
+        email,
+        name, // Ensure that you also store the name
       });
 
-      setShowModal(false); // Close modal after successful submission
-    } catch (error) {
-      errorRef.current.textContent = 'Failed to add user. Try again.';
-      console.error('Error adding user:', error);
+      onUserAdded(); // Notify parent component to refresh the user list
+      setEmail('');
+      setName('');
+      onClose(); // Close the modal after adding user
+    } catch (err) {
+      console.error('Error adding user:', err);
+      setError('Failed to add user. Please try again.');
     }
   };
 
+  if (!isOpen) return null;
+
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
-      <div className="bg-white p-6 rounded-lg shadow-lg">
-        <h2 className="text-xl font-semibold mb-4">Add New User</h2>
-        <form onSubmit={handleAddUser}>
+      <div className="bg-white p-5 rounded-lg shadow-lg">
+        <h2 className="text-lg font-bold">Add User</h2>
+        {error && <p className="text-red-500">{error}</p>}
+        <form onSubmit={handleAddUser} className="flex flex-col">
           <input
             type="email"
-            placeholder="Enter Email"
-            ref={emailRef}
-            className="border border-gray-300 p-2 w-full mb-4 rounded"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="p-2 mb-2 border border-gray-400 rounded text-black"
+            required
           />
           <input
             type="text"
-            placeholder="Enter Name"
-            ref={nameRef}
-            className="border border-gray-300 p-2 w-full mb-4 rounded"
+            placeholder="Name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="p-2 mb-2 border border-gray-400 rounded text-black"
+            required
           />
-          <p ref={errorRef} className="text-red-500 mb-2"></p>
-          <button
-            type="submit"
-            className="bg-blue-500 text-white px-4 py-2 rounded"
-          >
-            Add User
-          </button>
-          <button
-            type="button"
-            className="ml-4 bg-red-500 text-white px-4 py-2 rounded"
-            onClick={() => setShowModal(false)}
-          >
-            Cancel
-          </button>
+          <button type="submit" className="bg-blue-500 text-white p-2 rounded">Add User</button>
+          <button type="button" onClick={onClose} className="mt-2 text-red-500">Cancel</button>
         </form>
       </div>
     </div>
   );
-};
+}
 
-export default AddUserModal;
+export default UserModal;
